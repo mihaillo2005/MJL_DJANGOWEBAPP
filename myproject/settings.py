@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-4^zbnxn(rop_tc+^6l*u8+0-w(wow@aq_m^89^!(%0$_^e6$$r'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with debug turned on in production.
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'home',
-    'registration', 
+    'registration',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
