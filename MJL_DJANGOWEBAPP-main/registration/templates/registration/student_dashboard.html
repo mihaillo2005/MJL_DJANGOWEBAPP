@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+</head>
+<body>
+
+    <h1>Student Dashboard</h1>
+
+    <!-- Existing Total Students Section with DOM element for JS update -->
+    <h2>Total Students</h2>
+    <p id="student-count">
+        {{ total_students }}
+    </p>
+
+    <!-- Status / Loading / Error Message Container for Fetch API -->
+    <div id="status-message"></div>
+
+    <!-- New Dynamic Student Records Table loaded via Fetch API -->
+    <h2>Student Records (Loaded via API)</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Course / Program</th>
+            </tr>
+        </thead>
+        <tbody id="student-table-body">
+            <!-- Dynamically populated by student_dashboard.js -->
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- Existing Program Distribution Section -->
+    <h2>Program Distribution</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Program</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in program_summary %}
+            <tr>
+                <td>{{ item.program }}</td>
+                <td>{{ item.total }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No program data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- Existing Students by Year Level Section -->
+    <h2>Students by Year Level</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Year Level</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in year_summary %}
+            <tr>
+                <td>{{ item.year_level }}</td>
+                <td>{{ item.total }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No year-level data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <a href="{% url 'student_list' %}">Back to Student List</a>
+
+    <!-- Static JavaScript File for Module 06 AJAX/Fetch functionality -->
+    <script src="{% static 'registration/js/student_dashboard.js' %}"></script>
+
+</body>
+</html>
