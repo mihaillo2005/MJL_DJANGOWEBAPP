@@ -129,3 +129,16 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+# Authentication Redirects
+LOGIN_REDIRECT_URL = '/registration/dashboard/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+
+# Django REST Framework Settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}

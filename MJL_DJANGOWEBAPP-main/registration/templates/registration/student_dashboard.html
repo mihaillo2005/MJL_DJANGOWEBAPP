@@ -8,16 +8,36 @@
 
     <h1>Student Dashboard</h1>
 
-    <!-- Existing Total Students Section with DOM element for JS update -->
+    <!-- Existing Total Students Section -->
     <h2>Total Students</h2>
     <p id="student-count">
         {{ total_students }}
     </p>
 
-    <!-- Status / Loading / Error Message Container for Fetch API -->
+    <!-- Enhancement Controls Section -->
+    <div style="margin-bottom: 20px;">
+        <input type="text" id="search-input" placeholder="Search by name or email..." style="padding: 5px; width: 250px;">
+        
+        <select id="program-filter" style="padding: 5px;">
+            <option value="">All Programs</option>
+            <!-- Options populated dynamically or standard options -->
+            <option value="BSIT">BSIT</option>
+            <option value="BSCS">BSCS</option>
+            <option value="BSCPE">BSCPE</option>
+        </select>
+
+        <button id="clear-filters-btn" style="padding: 5px 10px;">Clear Filters</button>
+        <button id="refresh-data-btn" style="padding: 5px 10px;">Refresh Data</button>
+
+        <span style="margin-left: 10px; font-weight: bold;">
+            Showing: <span id="filtered-count">0</span> records
+        </span>
+    </div>
+
+    <!-- Status / Loading / Error Message Container -->
     <div id="status-message"></div>
 
-    <!-- New Dynamic Student Records Table loaded via Fetch API -->
+    <!-- Dynamic Student Records Table -->
     <h2>Student Records (Loaded via API)</h2>
     <table border="1">
         <thead>
@@ -32,6 +52,11 @@
             <!-- Dynamically populated by student_dashboard.js -->
         </tbody>
     </table>
+
+    <!-- Empty State Message Container -->
+    <div id="no-records-msg" style="display: none; color: red; margin-top: 10px; font-weight: bold;">
+        No matching student records found.
+    </div>
 
     <hr>
 
@@ -87,7 +112,7 @@
 
     <a href="{% url 'student_list' %}">Back to Student List</a>
 
-    <!-- Static JavaScript File for Module 06 AJAX/Fetch functionality -->
+    <!-- Static JavaScript File -->
     <script src="{% static 'registration/js/student_dashboard.js' %}"></script>
 
 </body>

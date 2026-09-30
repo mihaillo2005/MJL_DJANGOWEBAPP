@@ -1,76 +1,105 @@
-document.addEventListener('DOMContentLoaded', () => {
-    fetchStudentData();
-});
+document.addEventListener('DOMContentLoaded', function () {
+    let allStudents = [];
 
-async function fetchStudentData() {
-    const studentCountEl = document.getElementById('student-count');
-    const studentTableBody = document.getElementById('student-table-body');
-    const statusMessageEl = document.getElementById('status-message');
+    const searchInput = document.getElementById('search-input');
+    const programFilter = document.getElementById('program-filter');
+    const clearFiltersBtn = document.getElementById('clear-filters-btn');
+    const refreshDataBtn = document.getElementById('refresh-data-btn');
+    const tableBody = document.getElementById('student-table-body');
+    const filteredCountSpan = document.getElementById('filtered-count');
+    const noRecordsMsg = document.getElementById('no-records-msg');
+    const statusMessage = document.getElementById('status-message');
+    const studentCountHeader = document.getElementById('student-count');
 
-    // Display Loading State
-    if (statusMessageEl) {
-        statusMessageEl.textContent = 'Loading student data...';
-        statusMessageEl.className = 'alert alert-info';
+    // Fetch initial student data from API
+    function fetchStudents() {
+        if (statusMessage) statusMessage.textContent = 'Loading student records...';
+
+        fetch('/api/students/')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                allStudents = data;
+                if (studentCountHeader) studentCountHeader.textContent = allStudents.length;
+                if (statusMessage) statusMessage.textContent = '';
+                applyFilters();
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                if (statusMessage) statusMessage.textContent = 'Error loading student data.';
+            });
     }
 
-    try {
-        // Fetch API request to the protected Django endpoint
-        const response = await fetch('/api/students/', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+    // Filter and render logic
+    function applyFilters() {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const selectedProgram = programFilter ? programFilter.value : '';
+
+        const filteredList = allStudents.filter(student => {
+            const fullName = (student.name || `${student.first_name || ''} ${student.last_name || ''}`).toLowerCase();
+            const email = (student.email || '').toLowerCase();
+            const program = student.program || student.course || '';
+
+            const matchesSearch = fullName.includes(query) || email.includes(query);
+            const matchesProgram = selectedProgram === '' || program === selectedProgram;
+
+            return matchesSearch && matchesProgram;
         });
 
-        // Handle Unauthenticated (401) or HTTP Errors
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error('401 Unauthorized: Please log in to view student data.');
-            }
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+        renderTable(filteredList);
+    }
+
+    // Render students into table and toggle empty state message
+    function renderTable(students) {
+        tableBody.innerHTML = '';
+
+        if (filteredCountSpan) {
+            filteredCountSpan.textContent = students.length;
         }
 
-        const data = await response.json();
-
-        // Update Student Count
-        if (studentCountEl) {
-            studentCountEl.textContent = data.count !== undefined ? data.count : (data.results ? data.results.length : data.length);
-        }
-
-        // Determine student array format (paginated or direct array)
-        const students = data.results || (Array.isArray(data) ? data : []);
-
-        // Clear table and status message
-        if (studentTableBody) studentTableBody.innerHTML = '';
-        if (statusMessageEl) statusMessageEl.textContent = '';
-
-        // Handle Empty Data State
         if (students.length === 0) {
-            if (statusMessageEl) {
-                statusMessageEl.textContent = 'No student records found.';
-                statusMessageEl.className = 'alert alert-warning';
-            }
-            return;
-        }
+            if (noRecordsMsg) noRecordsMsg.style.display = 'block';
+        } else {
+            if (noRecordsMsg) noRecordsMsg.style.display = 'none';
 
-        // Dynamically Render Student Records into DOM
-        students.forEach(student => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${student.id || student.student_id || '-'}</td>
-                <td>${student.first_name || ''} ${student.last_name || ''}</td>
-                <td>${student.email || '-'}</td>
-                <td>${student.course || student.program || '-'}</td>
-            `;
-            studentTableBody.appendChild(row);
-        });
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                const name = student.name || `${student.first_name || ''} ${student.last_name || ''}`;
+                const program = student.program || student.course || 'N/A';
 
-    } catch (error) {
-        console.error('Fetch error:', error);
-        if (statusMessageEl) {
-            statusMessageEl.textContent = error.message;
-            statusMessageEl.className = 'alert alert-danger';
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${name}</td>
+                    <td>${student.email}</td>
+                    <td>${program}</td>
+                `;
+                tableBody.appendChild(row);
+            });
         }
     }
-}
+
+    // Event Listeners
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    if (programFilter) programFilter.addEventListener('change', applyFilters);
+
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function () {
+            if (searchInput) searchInput.value = '';
+            if (programFilter) programFilter.value = '';
+            applyFilters();
+        });
+    }
+
+    if (refreshDataBtn) {
+        refreshDataBtn.addEventListener('click', function () {
+            fetchStudents();
+        });
+    }
+
+    // Initial load
+    fetchStudents();
+});
