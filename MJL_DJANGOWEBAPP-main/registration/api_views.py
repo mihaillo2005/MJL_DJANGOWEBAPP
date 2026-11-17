@@ -12,7 +12,11 @@ def student_api(request):
     if request.method == 'GET':
         students = Student.objects.all()
         serializer = StudentSerializer(students, many=True)
-        return Response(serializer.data)
+        # Wrap the data in a dictionary containing 'count' and 'students'
+        return Response({
+            'count': students.count(),
+            'students': serializer.data
+        })
 
     if request.method == 'POST':
         serializer = StudentSerializer(data=request.data)

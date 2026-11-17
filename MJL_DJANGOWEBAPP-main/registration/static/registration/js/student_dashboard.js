@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const statusMessage = document.getElementById('status-message');
     const studentCountHeader = document.getElementById('student-count');
 
-    // Fetch initial student data from API
     function fetchStudents() {
         if (statusMessage) statusMessage.textContent = 'Loading student records...';
 
@@ -23,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
-                allStudents = data;
+                allStudents = data.students || data;
                 if (studentCountHeader) studentCountHeader.textContent = allStudents.length;
                 if (statusMessage) statusMessage.textContent = '';
                 applyFilters();
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // Filter and render logic
     function applyFilters() {
         const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
         const selectedProgram = programFilter ? programFilter.value : '';
@@ -53,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
         renderTable(filteredList);
     }
 
-    // Render students into table and toggle empty state message
     function renderTable(students) {
         tableBody.innerHTML = '';
 
@@ -82,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Event Listeners
     if (searchInput) searchInput.addEventListener('input', applyFilters);
     if (programFilter) programFilter.addEventListener('change', applyFilters);
 
@@ -100,6 +96,5 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Initial load
     fetchStudents();
 });
